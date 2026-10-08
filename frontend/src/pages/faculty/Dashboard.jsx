@@ -7,6 +7,7 @@ import { campusRequestService } from '../../services/campusRequestService';
 import { useAsync } from '../../hooks/useAsync';
 import DashboardCard from '../../components/DashboardCard.jsx';
 import LoadingSpinner from '../../components/LoadingSpinner.jsx';
+import LatestComplaints from '../../components/LatestComplaints.jsx';
 import { BookOpen, ClipboardCheck, FileText, MessageSquareWarning } from 'lucide-react';
 
 export default function FacultyDashboard() {
@@ -54,6 +55,7 @@ export default function FacultyDashboard() {
           <p key={notice._id} className="text-sm">{notice.title}</p>
         ))}
       </div>
+      <LatestComplaints complaints={data.complaints} to="/faculty/complaints" />
     </div>
   );
 }

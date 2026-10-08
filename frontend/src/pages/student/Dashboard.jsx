@@ -10,6 +10,7 @@ import { useAsync } from '../../hooks/useAsync';
 import DashboardCard from '../../components/DashboardCard.jsx';
 import LoadingSpinner from '../../components/LoadingSpinner.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
+import LatestComplaints from '../../components/LatestComplaints.jsx';
 import { CalendarCheck, FileText, Megaphone, MessageSquareWarning } from 'lucide-react';
 
 export default function StudentDashboard() {
@@ -66,6 +67,7 @@ export default function StudentDashboard() {
           ))}
         </div>
       </div>
+      <LatestComplaints complaints={data.complaints} to="/student/complaints" />
       <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
         {[
           ['Leave', data.leave],
