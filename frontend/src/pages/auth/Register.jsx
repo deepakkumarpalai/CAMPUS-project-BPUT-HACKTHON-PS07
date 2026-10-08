@@ -16,7 +16,9 @@ export default function Register() {
     phone: '',
     department: '',
     studentId: '',
-    facultyId: ''
+    facultyId: '',
+    year: '',
+    group: ''
   });
   const [loading, setLoading] = useState(false);
 
@@ -58,7 +60,6 @@ export default function Register() {
             <select value={form.role} onChange={(e) => setForm({ ...form, role: e.target.value })}>
               <option value="STUDENT">Student</option>
               <option value="FACULTY">Faculty</option>
-              <option value="ADMIN">Admin</option>
             </select>
           </div>
           <div>
@@ -70,10 +71,23 @@ export default function Register() {
             <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
           </div>
           {form.role === 'STUDENT' && (
-            <div>
-              <label>Student ID</label>
-              <input value={form.studentId} onChange={(e) => setForm({ ...form, studentId: e.target.value })} />
-            </div>
+            <>
+              <div>
+                <label>Student ID</label>
+                <input value={form.studentId} onChange={(e) => setForm({ ...form, studentId: e.target.value })} />
+              </div>
+              <div>
+                <label>Year</label>
+                <select value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })}>
+                  <option value="">Select year</option>
+                  {[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>{year}</option>)}
+                </select>
+              </div>
+              <div>
+                <label>Group</label>
+                <input maxLength={40} value={form.group} onChange={(e) => setForm({ ...form, group: e.target.value })} />
+              </div>
+            </>
           )}
           {form.role === 'FACULTY' && (
             <div>

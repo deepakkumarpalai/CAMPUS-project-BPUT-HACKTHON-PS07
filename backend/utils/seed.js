@@ -10,6 +10,7 @@ const GatePass = require('../models/GatePass');
 const CampusRequest = require('../models/CampusRequest');
 const Notification = require('../models/Notification');
 const AIAnalysis = require('../models/AIAnalysis');
+const { getSlaDeadline } = require('../services/complaintSla');
 
 const DEMO_MARKER = true;
 
@@ -171,6 +172,7 @@ const seed = async () => {
     description: 'The water supply has stopped in Hostel Block B since morning and many students are affected.',
     category: 'WATER',
     priority: 'HIGH',
+    dueAt: getSlaDeadline('HIGH'),
     aiRecommendedPriority: 'HIGH',
     finalPriority: 'HIGH',
     priorityReason: 'An essential service is unavailable and multiple students may be affected.',
@@ -185,6 +187,7 @@ const seed = async () => {
     description: 'Hostel B water supply is not working. Students cannot fill bottles.',
     category: 'WATER',
     priority: 'HIGH',
+    dueAt: getSlaDeadline('HIGH'),
     aiRecommendedPriority: 'HIGH',
     finalPriority: 'HIGH',
     status: 'PENDING',
@@ -218,6 +221,7 @@ const seed = async () => {
     description: 'The projector in CS-201 is not turning on before lectures.',
     category: 'ACADEMIC',
     priority: 'MEDIUM',
+    dueAt: getSlaDeadline('MEDIUM'),
     aiRecommendedPriority: 'MEDIUM',
     finalPriority: 'MEDIUM',
     status: 'IN_PROGRESS',

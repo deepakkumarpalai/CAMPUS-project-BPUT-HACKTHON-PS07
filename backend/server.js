@@ -5,9 +5,10 @@ const helmet = require('helmet');
 const cors = require('cors');
 const rateLimit = require('express-rate-limit');
 const connectDB = require('./config/db');
+const { startComplaintEscalationScheduler } = require('./services/complaintEscalationService');
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
-connectDB();
+connectDB().then(startComplaintEscalationScheduler);
 
 const app = express();
 
@@ -54,6 +55,8 @@ app.use('/api/leave', require('./routes/leaveRoutes'));
 app.use('/api/complaints', require('./routes/complaintRoutes'));
 app.use('/api/certificates', require('./routes/certificateRoutes'));
 app.use('/api/gate-pass', require('./routes/gatePassRoutes'));
+app.use('/api/visitors', require('./routes/visitorRoutes'));
+app.use('/api/audit-logs', require('./routes/auditRoutes'));
 app.use('/api/campus-requests', require('./routes/campusRequestRoutes'));
 app.use('/api/notifications', require('./routes/notificationRoutes'));
 app.use('/api/events', require('./routes/eventRoutes'));

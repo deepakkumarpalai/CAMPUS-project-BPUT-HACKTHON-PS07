@@ -43,6 +43,12 @@ import EventHubPage from '../pages/shared/EventHubPage.jsx';
 import ExamsPage from '../pages/shared/ExamsPage.jsx';
 import InteractionsPage from '../pages/shared/InteractionsPage.jsx';
 import PaymentsPage from '../pages/shared/PaymentsPage.jsx';
+import VisitorRequest from '../pages/shared/VisitorRequest.jsx';
+import AdminVisitors from '../pages/admin/Visitors.jsx';
+import VisitorVerification from '../pages/security/VisitorVerification.jsx';
+import SecurityLayout from '../layouts/SecurityLayout.jsx';
+import SecurityUsers from '../pages/admin/SecurityUsers.jsx';
+import AuditLogs from '../pages/admin/AuditLogs.jsx';
 
 const StudentShell = ({ children }) => (
   <ProtectedRoute>
@@ -68,6 +74,14 @@ const AdminShell = ({ children }) => (
   </ProtectedRoute>
 );
 
+const SecurityShell = ({ children }) => (
+  <ProtectedRoute>
+    <RoleRoute roles={['SECURITY']}>
+      <SecurityLayout>{children}</SecurityLayout>
+    </RoleRoute>
+  </ProtectedRoute>
+);
+
 function HomeRedirect() {
   const { isAuthenticated, user, loading } = useAuth();
   if (loading) return <LoadingSpinner />;
@@ -81,6 +95,8 @@ export default function AppRoutes() {
       <Route path="/" element={<HomeRedirect />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
+      <Route path="/visitor/request" element={<VisitorRequest />} />
+      <Route path="/security/visitors" element={<SecurityShell><VisitorVerification /></SecurityShell>} />
 
       <Route path="/student/dashboard" element={<StudentShell><StudentDashboard /></StudentShell>} />
       <Route path="/student/profile" element={<StudentShell><StudentProfile /></StudentShell>} />
@@ -122,8 +138,11 @@ export default function AppRoutes() {
       <Route path="/admin/leave" element={<AdminShell><AdminLeave /></AdminShell>} />
       <Route path="/admin/certificates" element={<AdminShell><AdminCertificates /></AdminShell>} />
       <Route path="/admin/gate-pass" element={<AdminShell><AdminGatePass /></AdminShell>} />
+      <Route path="/admin/visitors" element={<AdminShell><AdminVisitors /></AdminShell>} />
+      <Route path="/admin/security-users" element={<AdminShell><SecurityUsers /></AdminShell>} />
       <Route path="/admin/services" element={<AdminShell><AdminServices /></AdminShell>} />
       <Route path="/admin/analytics" element={<AdminShell><AdminAnalytics /></AdminShell>} />
+      <Route path="/admin/audit-logs" element={<AdminShell><AuditLogs /></AdminShell>} />
       <Route path="/admin/notifications" element={<AdminShell><AdminNotifications /></AdminShell>} />
 
       <Route path="*" element={<Navigate to="/" replace />} />

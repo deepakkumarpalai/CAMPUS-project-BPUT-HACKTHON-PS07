@@ -18,6 +18,9 @@ export default function NoticesPage({ canManage = false }) {
     targetAudience: 'ALL',
     priority: 'MEDIUM',
     department: '',
+    targetRole: 'STUDENT',
+    targetYear: '',
+    targetGroup: '',
     expiresAt: ''
   });
 
@@ -102,6 +105,9 @@ export default function NoticesPage({ canManage = false }) {
                 <option>STUDENTS</option>
                 <option>FACULTY</option>
                 <option>SPECIFIC_DEPARTMENT</option>
+                <option>SPECIFIC_ROLE</option>
+                <option>SPECIFIC_YEAR</option>
+                <option>SPECIFIC_GROUP</option>
               </select>
             </div>
             <div>
@@ -114,10 +120,10 @@ export default function NoticesPage({ canManage = false }) {
               </select>
             </div>
           </div>
-          <div>
-            <label>Department (optional)</label>
-            <input value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} />
-          </div>
+          {form.targetAudience === 'SPECIFIC_DEPARTMENT' && <div><label>Department</label><input required value={form.department} onChange={(e) => setForm({ ...form, department: e.target.value })} /></div>}
+          {form.targetAudience === 'SPECIFIC_ROLE' && <div><label>Role</label><select value={form.targetRole} onChange={(e) => setForm({ ...form, targetRole: e.target.value })}><option value="STUDENT">Student</option><option value="FACULTY">Faculty</option><option value="ADMIN">Admin</option><option value="SECURITY">Security</option></select></div>}
+          {form.targetAudience === 'SPECIFIC_YEAR' && <div><label>Student year</label><select required value={form.targetYear} onChange={(e) => setForm({ ...form, targetYear: e.target.value })}><option value="">Select year</option>{[1, 2, 3, 4, 5, 6].map((year) => <option key={year} value={year}>{year}</option>)}</select></div>}
+          {form.targetAudience === 'SPECIFIC_GROUP' && <div><label>Group</label><input required maxLength={40} value={form.targetGroup} onChange={(e) => setForm({ ...form, targetGroup: e.target.value })} /></div>}
           <button className="btn-primary">Publish</button>
         </form>
       </Modal>

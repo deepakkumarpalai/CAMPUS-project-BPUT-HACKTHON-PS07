@@ -7,6 +7,7 @@ import {
   CalendarDays,
   ClipboardCheck,
   ClipboardList,
+  ContactRound,
   FileText,
   GraduationCap,
   Home,
@@ -14,6 +15,7 @@ import {
   Megaphone,
   MessageSquareWarning,
   MessageCircle,
+  ShieldCheck,
   Ticket,
   Users,
   WalletCards,
@@ -34,8 +36,11 @@ const items = [
   { to: '/admin/leave', label: 'Leave', icon: <FileText size={16} /> },
   { to: '/admin/certificates', label: 'Certificates', icon: <IdCard size={16} /> },
   { to: '/admin/gate-pass', label: 'Gate Pass', icon: <Ticket size={16} /> },
+  { to: '/admin/visitors', label: 'Visitors', icon: <ContactRound size={16} /> },
+  { to: '/admin/security-users', label: 'Security Accounts', icon: <ShieldCheck size={16} /> },
   { to: '/admin/services', label: 'Services', icon: <Wrench size={16} /> },
   { to: '/admin/analytics', label: 'Analytics', icon: <BarChart3 size={16} /> },
+  { to: '/admin/audit-logs', label: 'Audit Log', icon: <FileText size={16} /> },
   { to: '/admin/notifications', label: 'Notifications', icon: <Bell size={16} /> }
 ];
 

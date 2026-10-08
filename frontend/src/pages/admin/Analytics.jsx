@@ -51,6 +51,32 @@ export default function AdminAnalytics() {
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Analytics</h2>
       <p className="text-sm text-slate-500">Average resolution time: {charts.averageResolutionHours} hours</p>
+      <section className="grid gap-3 sm:grid-cols-2" aria-label="Campus service signals">
+        <div className="border-l-4 border-blue-600 bg-white p-4">
+          <p className="text-sm text-slate-500">Complaints, last 7 days</p>
+          <p className="text-2xl font-semibold">{charts.complaintsThisWeek ?? 0}</p>
+          <p className="text-xs text-slate-500">{charts.weeklyChangePercent === null ? 'No complaints in the previous 7 days' : `${charts.weeklyChangePercent > 0 ? '+' : ''}${charts.weeklyChangePercent}% vs previous 7 days`}</p>
+        </div>
+        <div className="border-l-4 border-teal-600 bg-white p-4">
+          <p className="text-sm text-slate-500">Busiest location, last 7 days</p>
+          <p className="text-lg font-semibold">{charts.busiestLocationThisWeek?.location || 'No location reported'}</p>
+          {charts.busiestLocationThisWeek && <p className="text-xs text-slate-500">{charts.busiestLocationThisWeek.count} complaints</p>}
+        </div>
+        <div className="border-l-4 border-red-600 bg-white p-4">
+          <p className="text-sm text-slate-500">Open complaints past SLA</p>
+          <p className="text-2xl font-semibold">{charts.overdueOpenComplaints ?? 0}</p>
+        </div>
+        <div className="border-l-4 border-amber-500 bg-white p-4">
+          <p className="text-sm text-slate-500">Recurring locations (14 days)</p>
+          <p className="text-2xl font-semibold">{charts.recurringIssues?.length ?? 0}</p>
+        </div>
+      </section>
+      {!!charts.recurringIssues?.length && (
+        <section className="space-y-2 border-y border-slate-200 py-4">
+          <h3 className="font-semibold">Recurring issues to review</h3>
+          {charts.recurringIssues.map((issue) => <p key={`${issue.category}-${issue.location}`} className="text-sm">{issue.category} · {issue.location}: {issue.count} reports in 14 days</p>)}
+        </section>
+      )}
       <div className="grid gap-4 xl:grid-cols-2">
         <ChartCard title="Complaints by category" items={charts.byCategory} />
         <ChartCard title="Complaints by priority" items={charts.byPriority} />

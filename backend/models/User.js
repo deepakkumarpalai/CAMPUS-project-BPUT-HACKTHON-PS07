@@ -16,12 +16,14 @@ const userSchema = new mongoose.Schema(
     studentDobHash: { type: String, select: false },
     role: {
       type: String,
-      enum: ['STUDENT', 'FACULTY', 'ADMIN'],
+      enum: ['STUDENT', 'FACULTY', 'ADMIN', 'SECURITY'],
       required: true
     },
     phone: { type: String, trim: true },
     department: { type: String, trim: true },
     studentId: { type: String, trim: true },
+    year: { type: Number, min: 1, max: 6 },
+    group: { type: String, trim: true, maxlength: 40 },
     facultyId: { type: String, trim: true },
     profileImage: { type: String, default: '' },
     courses: [{ type: String }],

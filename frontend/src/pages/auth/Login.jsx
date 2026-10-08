@@ -46,7 +46,7 @@ export default function Login() {
           <h2 className="text-2xl font-semibold">Sign in</h2>
           <div className="grid grid-cols-2 gap-2 rounded-lg bg-slate-100 p-1">
             <button className={`rounded-md px-3 py-2 text-sm font-medium ${loginMode === 'student' ? 'bg-white shadow-sm' : 'text-slate-600'}`} type="button" onClick={() => setLoginMode('student')}>Student</button>
-            <button className={`rounded-md px-3 py-2 text-sm font-medium ${loginMode === 'email' ? 'bg-white shadow-sm' : 'text-slate-600'}`} type="button" onClick={() => setLoginMode('email')}>Faculty / Admin</button>
+            <button className={`rounded-md px-3 py-2 text-sm font-medium ${loginMode === 'email' ? 'bg-white shadow-sm' : 'text-slate-600'}`} type="button" onClick={() => setLoginMode('email')}>Staff / Admin</button>
           </div>
           {loginMode === 'student' ? (
             <>
@@ -78,6 +78,7 @@ export default function Login() {
           {loginMode === 'email' && <p className="text-sm text-slate-500">
             New user? <Link className="text-blue-700" to="/register">Register</Link>
           </p>}
+          <p className="text-sm text-slate-500">Visiting campus? <Link className="text-blue-700" to="/visitor/request">Request a visitor pass</Link></p>
           <div className="rounded-lg bg-slate-50 p-3 text-xs text-slate-600">
             Demo account passwords must be configured in backend/.env before running the seed script.
           </div>

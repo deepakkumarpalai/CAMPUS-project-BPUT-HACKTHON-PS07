@@ -52,7 +52,12 @@ const complaintSchema = new mongoose.Schema(
     linkedComplaints: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Complaint' }],
     mergedInto: { type: mongoose.Schema.Types.ObjectId, ref: 'Complaint' },
     aiAnalysis: { type: mongoose.Schema.Types.ObjectId, ref: 'AIAnalysis' },
-    resolvedAt: { type: Date }
+    resolvedAt: { type: Date },
+    dueAt: { type: Date },
+    lastEscalatedAt: { type: Date },
+    escalationCount: { type: Number, default: 0 },
+    recurrenceCount: { type: Number, default: 1 },
+    isRecurring: { type: Boolean, default: false }
   },
   { timestamps: true }
 );

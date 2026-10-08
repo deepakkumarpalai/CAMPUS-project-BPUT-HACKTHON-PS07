@@ -10,10 +10,10 @@ const STOP_WORDS = new Set([
 const CATEGORY_RULES = [
   { category: 'SECURITY', keywords: ['fire', 'assault', 'threat', 'weapon', 'emergency', 'theft', 'security'] },
   { category: 'WATER', keywords: ['water', 'tap', 'pipeline', 'supply', 'leak'] },
-  { category: 'ELECTRICAL', keywords: ['electric', 'electricity', 'power', 'light', 'fan', 'outage'] },
+  { category: 'ELECTRICAL', keywords: ['electric', 'electricity', 'power', 'light', 'fan', 'outage', 'projector'] },
   { category: 'IT', keywords: ['wifi', 'wi-fi', 'internet', 'network', 'computer', 'portal', 'login'] },
   { category: 'CLEANLINESS', keywords: ['clean', 'garbage', 'hygiene', 'sanitation', 'dirty', 'smell'] },
-  { category: 'HOSTEL', keywords: ['hostel', 'room', 'warden', 'block'] },
+  { category: 'HOSTEL', keywords: ['hostel', 'warden', 'block'] },
   { category: 'MESS', keywords: ['mess', 'food', 'canteen', 'meal'] },
   { category: 'TRANSPORT', keywords: ['bus', 'transport', 'vehicle'] },
   { category: 'LIBRARY', keywords: ['library', 'book'] },
@@ -95,7 +95,7 @@ const detectPriority = (text, category) => {
       reason: 'A safety or security emergency was detected. Administrators should review immediately.'
     };
   }
-  if (highWords.some((word) => lower.includes(word)) || ['WATER', 'ELECTRICAL'].includes(category)) {
+  if (highWords.some((word) => lower.includes(word)) || category === 'WATER') {
     return {
       priority: 'HIGH',
       reason: 'An essential campus service appears unavailable and multiple users may be affected.'
@@ -238,6 +238,9 @@ const mapServiceCategory = (category) => SERVICE_CATEGORY_MAP[category] || 'Othe
 module.exports = {
   analyzeRequest,
   mapServiceCategory,
+  detectCategory,
+  detectDepartment,
+  detectPriority,
   detectCategory,
   detectPriority
 };

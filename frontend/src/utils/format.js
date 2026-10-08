@@ -11,6 +11,7 @@ export const formatDateTime = (value) => {
 export const dashboardPath = (role) => {
   if (role === 'ADMIN') return '/admin/dashboard';
   if (role === 'FACULTY') return '/faculty/dashboard';
+  if (role === 'SECURITY') return '/security/visitors';
   return '/student/dashboard';
 };
 

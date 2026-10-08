@@ -6,7 +6,7 @@ import LoadingSpinner from '../../components/LoadingSpinner.jsx';
 import Table from '../../components/Table.jsx';
 import StatusBadge from '../../components/StatusBadge.jsx';
 import Modal from '../../components/Modal.jsx';
-import { formatDate } from '../../utils/format.js';
+import { formatDate, formatDateTime } from '../../utils/format.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
@@ -85,6 +85,8 @@ export default function ComplaintsPage({ mode = 'student' }) {
           { key: 'status', label: 'Status', render: (row) => <StatusBadge value={row.status} /> },
           { key: 'department', label: 'Department' },
           { key: 'location', label: 'Location' },
+          { key: 'sla', label: 'SLA', render: (row) => row.dueAt ? <span className={row.status !== 'RESOLVED' && row.status !== 'REJECTED' && new Date(row.dueAt) < new Date() ? 'font-semibold text-red-700' : 'text-slate-600'}>{formatDateTime(row.dueAt)}{row.escalationCount > 0 ? ` · ${row.escalationCount} escalations` : ''}</span> : '—' },
+          { key: 'recurrence', label: 'Recurring', render: (row) => row.isRecurring ? <span className="font-medium text-amber-700">{row.recurrenceCount} reports / 14d</span> : '—' },
           { key: 'date', label: 'Submitted', render: (row) => formatDate(row.createdAt) },
           { key: 'assigned', label: 'Assigned', render: (row) => row.assignedTo?.name || '—' },
           ...(canManage
@@ -123,6 +125,8 @@ export default function ComplaintsPage({ mode = 'student' }) {
               <p>Summary: {selected.aiAnalysis?.summary || '—'}</p>
               <p>Reason: {selected.priorityReason || selected.aiAnalysis?.reason}</p>
               <p>Keywords: {(selected.aiAnalysis?.keywords || []).join(', ') || '—'}</p>
+              <p>SLA due: {formatDateTime(selected.dueAt)} · Escalations: {selected.escalationCount || 0}</p>
+              {selected.isRecurring && <p className="mt-2 font-medium text-amber-700">Recurring issue: {selected.recurrenceCount} reports at this location in 14 days.</p>}
               {selected.aiAnalysis?.possibleDuplicate && (
                 <p className="mt-2 font-medium text-amber-700">Possible related complaint found.</p>
               )}

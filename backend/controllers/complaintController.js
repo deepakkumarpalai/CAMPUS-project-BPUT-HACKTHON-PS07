@@ -3,6 +3,8 @@ const { asyncHandler } = require('../middleware/errorMiddleware');
 const { validateComplaint } = require('../validators/complaintValidator');
 const { analyzeRequest } = require('../services/aiService');
 const { createNotification, notifyAdmins } = require('../services/notificationService');
+const { getSlaDeadline } = require('../services/complaintSla');
+const { recordAudit } = require('../services/auditService');
 
 const PRIORITY_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
 
@@ -80,9 +82,22 @@ const createComplaint = asyncHandler(async (req, res) => {
   complaint.aiRecommendedPriority = analysis.priority;
   complaint.priority = analysis.priority;
   complaint.finalPriority = analysis.priority;
+  complaint.dueAt = getSlaDeadline(analysis.priority, complaint.createdAt);
   complaint.priorityReason = analysis.reason;
   complaint.department = complaint.department || analysis.department;
   complaint.aiAnalysis = analysis._id;
+
+  if (complaint.location.trim()) {
+    const recurrenceWindow = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+    const previousMatches = await Complaint.countDocuments({
+      _id: { $ne: complaint._id },
+      category: complaint.category,
+      location: complaint.location,
+      createdAt: { $gte: recurrenceWindow }
+    });
+    complaint.recurrenceCount = previousMatches + 1;
+    complaint.isRecurring = complaint.recurrenceCount >= 3;
+  }
   await complaint.save();
 
   await notifyAdmins({
@@ -90,6 +105,13 @@ const createComplaint = asyncHandler(async (req, res) => {
     message: `${complaint.title} (${analysis.analysisMode === 'AI' ? 'AI Analysis' : 'Rule-Based Analysis'})`,
     type: 'COMPLAINT'
   });
+  if (complaint.isRecurring) {
+    await notifyAdmins({
+      title: 'Recurring campus issue detected',
+      message: `${complaint.recurrenceCount} ${complaint.category} reports were submitted at ${complaint.location} within 14 days. Consider a permanent fix.`,
+      type: 'COMPLAINT'
+    });
+  }
 
   const populated = await Complaint.findById(complaint._id).populate('aiAnalysis');
   res.status(201).json({ success: true, data: populated });
@@ -125,12 +147,21 @@ const updateComplaint = asyncHandler(async (req, res) => {
     complaint.priority = req.body.priority || req.body.finalPriority;
     complaint.priorityReviewedBy = req.user._id;
     complaint.priorityReviewedAt = new Date();
+    complaint.dueAt = getSlaDeadline(complaint.finalPriority, complaint.createdAt);
   }
 
   if (req.body.status === 'RESOLVED') complaint.resolvedAt = new Date();
+  else if (req.body.status && req.body.status !== 'RESOLVED') complaint.resolvedAt = undefined;
   if (req.body.status === 'ASSIGNED' && req.body.assignedTo) complaint.status = 'ASSIGNED';
 
   const updated = await complaint.save();
+  await recordAudit({
+    actor: req.user,
+    action: 'COMPLAINT_REVIEWED',
+    entityType: 'COMPLAINT',
+    entityId: updated._id,
+    details: { status: updated.status, priority: updated.finalPriority || updated.priority, assignedTo: updated.assignedTo || '' }
+  });
 
   if (req.body.status && req.body.status !== previousStatus) {
     await createNotification({
@@ -183,10 +214,40 @@ const getComplaintAnalytics = asyncHandler(async (req, res) => {
     : 0;
 
   const overTime = {};
+  const recurrenceWindow = new Date(Date.now() - 14 * 24 * 60 * 60 * 1000);
+  const recurringGroups = {};
   complaints.forEach((item) => {
     const day = new Date(item.createdAt).toISOString().slice(0, 10);
     overTime[day] = (overTime[day] || 0) + 1;
+    if (item.location && new Date(item.createdAt) >= recurrenceWindow) {
+      const key = `${item.category}::${item.location}`;
+      recurringGroups[key] = (recurringGroups[key] || 0) + 1;
+    }
   });
+
+  const now = new Date();
+  const weekStart = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+  const previousWeekStart = new Date(now.getTime() - 14 * 24 * 60 * 60 * 1000);
+  const thisWeek = complaints.filter((item) => new Date(item.createdAt) >= weekStart);
+  const previousWeek = complaints.filter((item) => {
+    const createdAt = new Date(item.createdAt);
+    return createdAt >= previousWeekStart && createdAt < weekStart;
+  });
+  const locationCounts = {};
+  thisWeek.forEach((item) => {
+    if (item.location) locationCounts[item.location] = (locationCounts[item.location] || 0) + 1;
+  });
+  const busiestLocation = Object.entries(locationCounts).sort((a, b) => b[1] - a[1])[0];
+  const overdueOpenComplaints = complaints.filter((item) =>
+    item.dueAt && new Date(item.dueAt) < now && !['RESOLVED', 'REJECTED'].includes(item.status)
+  ).length;
+  const recurringIssues = Object.entries(recurringGroups)
+    .filter(([, count]) => count >= 3)
+    .map(([key, count]) => {
+      const [category, location] = key.split('::');
+      return { category, location, count };
+    })
+    .sort((a, b) => b.count - a.count);
 
   res.json({
     success: true,
@@ -203,6 +264,14 @@ const getComplaintAnalytics = asyncHandler(async (req, res) => {
         { name: 'In Progress', value: complaints.filter((item) => ['ASSIGNED', 'IN_PROGRESS'].includes(item.status)).length }
       ],
       averageResolutionHours: avgResolutionHours,
+      overdueOpenComplaints,
+      recurringIssues,
+      complaintsThisWeek: thisWeek.length,
+      complaintsPreviousWeek: previousWeek.length,
+      weeklyChangePercent: previousWeek.length
+        ? Math.round(((thisWeek.length - previousWeek.length) / previousWeek.length) * 100)
+        : null,
+      busiestLocationThisWeek: busiestLocation ? { location: busiestLocation[0], count: busiestLocation[1] } : null,
       requestsOverTime: Object.entries(overTime)
         .sort(([a], [b]) => (a > b ? 1 : -1))
         .map(([name, value]) => ({ name, value }))

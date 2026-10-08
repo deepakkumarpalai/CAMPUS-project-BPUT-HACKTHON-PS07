@@ -1,6 +1,30 @@
 const User = require('../models/User');
 const { asyncHandler } = require('../middleware/errorMiddleware');
 const { sanitizeUser } = require('./authController');
+const { EMAIL_REGEX } = require('../validators/authValidator');
+const { recordAudit } = require('../services/auditService');
+
+const createSecurityUser = asyncHandler(async (req, res) => {
+  const { name, email, password } = req.body;
+  if (typeof name !== 'string' || !name.trim() || name.length > 100) {
+    return res.status(400).json({ success: false, message: 'Enter a name up to 100 characters.' });
+  }
+  if (typeof email !== 'string' || !EMAIL_REGEX.test(email)) {
+    return res.status(400).json({ success: false, message: 'Enter a valid email address.' });
+  }
+  if (typeof password !== 'string' || password.length < 8) {
+    return res.status(400).json({ success: false, message: 'Password must be at least 8 characters.' });
+  }
+
+  const normalizedEmail = email.trim().toLowerCase();
+  if (await User.exists({ email: normalizedEmail })) {
+    return res.status(409).json({ success: false, message: 'An account with this email already exists.' });
+  }
+
+  const user = await User.create({ name: name.trim(), email: normalizedEmail, password, role: 'SECURITY' });
+  await recordAudit({ actor: req.user, action: 'SECURITY_ACCOUNT_CREATED', entityType: 'USER', entityId: user._id });
+  res.status(201).json({ success: true, data: sanitizeUser(user) });
+});
 
 const getUsers = asyncHandler(async (req, res) => {
   const filter = {};
@@ -35,6 +59,7 @@ const updateUser = asyncHandler(async (req, res) => {
   }
 
   const allowed = ['name', 'phone', 'department', 'studentId', 'facultyId', 'profileImage', 'courses'];
+  if (req.user.role === 'ADMIN') allowed.push('year', 'group');
   if (req.user.role === 'ADMIN') allowed.push('role');
 
   allowed.forEach((field) => {
@@ -53,6 +78,7 @@ const deleteUser = asyncHandler(async (req, res) => {
   const user = await User.findById(req.params.id);
   if (!user) return res.status(404).json({ success: false, message: 'User not found.' });
   await user.deleteOne();
+  await recordAudit({ actor: req.user, action: 'USER_DELETED', entityType: 'USER', entityId: user._id });
   res.json({ success: true, message: 'User deleted.' });
 });
 
@@ -111,4 +137,4 @@ const getDashboardStats = asyncHandler(async (req, res) => {
   });
 });
 
-module.exports = { getUsers, getUserById, updateUser, deleteUser, getDashboardStats };
+module.exports = { createSecurityUser, getUsers, getUserById, updateUser, deleteUser, getDashboardStats };

@@ -17,6 +17,8 @@ const sanitizeUser = (user) => ({
   phone: user.phone,
   department: user.department,
   studentId: user.studentId,
+  year: user.year,
+  group: user.group,
   facultyId: user.facultyId,
   profileImage: user.profileImage,
   courses: user.courses || [],
@@ -31,13 +33,13 @@ const register = asyncHandler(async (req, res) => {
     return res.status(400).json({ success: false, message: errors.join(' ') });
   }
 
-  const { name, email, password, role, phone, department, studentId, facultyId } = req.body;
+  const { name, email, password, role, phone, department, studentId, facultyId, year, group } = req.body;
   const exists = await User.findOne({ email });
   if (exists) {
     return res.status(400).json({ success: false, message: 'An account with this email already exists.' });
   }
 
-  const assignedRole = role && ['STUDENT', 'FACULTY', 'ADMIN'].includes(role) ? role : 'STUDENT';
+  const assignedRole = role === 'FACULTY' ? 'FACULTY' : 'STUDENT';
   const user = await User.create({
     name,
     email,
@@ -46,7 +48,9 @@ const register = asyncHandler(async (req, res) => {
     phone,
     department,
     studentId,
-    facultyId
+    facultyId,
+    year: assignedRole === 'STUDENT' && year ? Number(year) : undefined,
+    group: assignedRole === 'STUDENT' ? group : undefined
   });
 
   res.status(201).json({
