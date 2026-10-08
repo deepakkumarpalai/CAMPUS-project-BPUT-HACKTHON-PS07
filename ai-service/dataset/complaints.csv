@@ -1,0 +1,179 @@
+complaint_text,category,severity,priority
+"No water is coming to our hostel block since early morning",Water Supply,Critical,CRITICAL
+"The whole hostel has had no running water all day",Water Supply,Critical,CRITICAL
+"There is no water supply for students in the residence",Water Supply,High,HIGH
+"Water stopped flowing from every tap in the hostel",Water Supply,Critical,CRITICAL
+"Several hostel floors are without water since morning",Water Supply,Critical,CRITICAL
+"The drinking water station is empty near the library",Water Supply,Medium,MEDIUM
+"A tap is leaking in one bathroom and needs repair",Water Supply,Low,LOW
+"The water pipe outside our block has burst and flooded the entrance",Water Supply,High,HIGH
+"Our hostel water is available only for a few minutes each day",Water Supply,High,HIGH
+"Students across the dormitory cannot use the water supply",Water Supply,Critical,CRITICAL
+"There is no electricity in the entire hostel building",Electrical,High,HIGH
+"Power has gone out in all classrooms in the east wing",Electrical,High,HIGH
+"A wire is sparking near the student common room",Electrical,Critical,CRITICAL
+"The electrical panel is smoking in the corridor",Electrical,Critical,CRITICAL
+"Repeated power cuts are affecting the whole laboratory block",Electrical,High,HIGH
+"One corridor light is flickering near room 204",Electrical,Low,LOW
+"The light in my hostel room stopped working",Electrical,Medium,MEDIUM
+"A ceiling fan in one student room is making noise",Electrical,Medium,MEDIUM
+"The fan in my room is not working properly",Electrical,Medium,MEDIUM
+"Several lights in the lecture hall are not turning on",Electrical,Medium,MEDIUM
+"There is a burning smell from a hostel electrical socket",Electrical,Critical,CRITICAL
+"A student got a mild electric shock from a damaged switch",Electrical,Critical,CRITICAL
+"The dormitory air conditioning is not cooling one room",Electrical,Low,LOW
+"The hostel backup generator did not start during a power cut",Electrical,High,HIGH
+"Our hostel room door lock is broken and will not secure",Hostel,High,HIGH
+"The hostel ceiling is leaking into one student's room",Hostel,Medium,MEDIUM
+"The corridor ceiling in the hostel is sagging and looks unsafe",Hostel,Critical,CRITICAL
+"Many residents have reported damaged window latches in the dormitory",Hostel,High,HIGH
+"The hostel warden has not responded to a room maintenance request",Hostel,Low,LOW
+"A broken bed frame needs repair in my room",Hostel,Low,LOW
+"There are bed bugs in several rooms of our hostel wing",Hostel,High,HIGH
+"Our dormitory entrance door cannot be closed properly",Hostel,Medium,MEDIUM
+"The mess served spoiled food and several students feel sick",Mess & Food,Critical,CRITICAL
+"Many students became ill after eating lunch at the campus mess",Mess & Food,Critical,CRITICAL
+"The food in the dining hall was cold and undercooked today",Mess & Food,Medium,MEDIUM
+"The hostel mess has run out of dinner for the whole block",Mess & Food,High,HIGH
+"There is a strong gas smell in the campus kitchen",Mess & Food,Critical,CRITICAL
+"The kitchen gas pipe is leaking near the mess cooking area",Mess & Food,Critical,CRITICAL
+"The canteen menu does not show allergen information",Mess & Food,Medium,MEDIUM
+"One meal was missing from my lunch order",Mess & Food,Low,LOW
+"The mess drinking water tastes unusual and several residents noticed",Mess & Food,High,HIGH
+"The dining hall floor is greasy and a student slipped",Mess & Food,High,HIGH
+"WiFi is down for every student in the hostel since last night",Wi-Fi & Internet,High,HIGH
+"The internet connection across the campus has stopped working",Wi-Fi & Internet,High,HIGH
+"WiFi drops repeatedly in the engineering laboratory",Wi-Fi & Internet,Medium,MEDIUM
+"The wireless network is very slow in my dorm room",Wi-Fi & Internet,Medium,MEDIUM
+"Students cannot access the online examination portal",Wi-Fi & Internet,High,HIGH
+"The campus network switch is overheating in the server room",Wi-Fi & Internet,Critical,CRITICAL
+"One computer in the library cannot connect to the internet",Wi-Fi & Internet,Low,LOW
+"Login to the student portal fails for several students",Wi-Fi & Internet,Medium,MEDIUM
+"The hostel bathroom floor is flooded and people may slip",Bathroom & Cleaning,High,HIGH
+"Bathrooms on the second hostel floor have not been cleaned",Bathroom & Cleaning,Medium,MEDIUM
+"There is sewage backing up in the shared residence bathroom",Bathroom & Cleaning,Critical,CRITICAL
+"The washroom tap and shower are both leaking in one room",Bathroom & Cleaning,Medium,MEDIUM
+"Overflowing garbage bins are causing a bad smell in the dining area",Bathroom & Cleaning,Medium,MEDIUM
+"Broken glass is scattered in the hallway and could injure someone",Bathroom & Cleaning,High,HIGH
+"The whole laboratory has not been cleaned after yesterday's class",Bathroom & Cleaning,Low,LOW
+"Pests were seen in several hostel bathrooms",Bathroom & Cleaning,High,HIGH
+"An unknown person is trying doors in the women's hostel at night",Security,High,HIGH
+"A stranger entered the hostel without showing identification",Security,High,HIGH
+"There is smoke and a possible fire in the laboratory",Security,Critical,CRITICAL
+"A student has been threatened near the main campus gate",Security,Critical,CRITICAL
+"The campus emergency exit is blocked by stored equipment",Security,Critical,CRITICAL
+"The security guard is missing from the main entrance post",Security,Medium,MEDIUM
+"A fire alarm is sounding in the academic building",Security,Critical,CRITICAL
+"A broken boundary fence leaves the campus perimeter open",Security,High,HIGH
+"A visitor is following students through a restricted entrance",Security,High,HIGH
+"A suspicious package was left beside the library entrance",Security,Critical,CRITICAL
+"My approved gate pass is not appearing in the student portal",Gate Pass,Medium,MEDIUM
+"Several students cannot generate a gate pass before the holiday",Gate Pass,High,HIGH
+"The gate pass scanner rejected my valid student pass",Gate Pass,Low,LOW
+"A student is being held at the gate despite a valid approved pass",Gate Pass,Medium,MEDIUM
+"The visitor pass system is offline at the main entrance",Gate Pass,Medium,MEDIUM
+"The projector stopped working in one classroom before the lecture",Classroom & Laboratory,Medium,MEDIUM
+"A lab power outlet is sparking while students are doing practical work",Classroom & Laboratory,Critical,CRITICAL
+"The laboratory equipment needed for today's class is unavailable",Classroom & Laboratory,Medium,MEDIUM
+"Broken stools in one lecture room need replacement",Classroom & Laboratory,Low,LOW
+"The chemistry lab fume extractor has stopped working",Classroom & Laboratory,High,HIGH
+"A classroom ceiling fan has fallen and blocked the aisle",Classroom & Laboratory,Critical,CRITICAL
+"The lecture hall microphone does not work for the instructor",Classroom & Laboratory,Low,LOW
+"All computers in the campus lab are unable to start",Classroom & Laboratory,High,HIGH
+"The college shuttle did not arrive and many students are stranded",Transport,High,HIGH
+"A campus bus has broken down on the road with students onboard",Transport,High,HIGH
+"The bus brakes are making a dangerous grinding noise",Transport,Critical,CRITICAL
+"The shuttle timetable is missing from the transport notice board",Transport,Low,LOW
+"Several students cannot board because the evening bus is overcrowded",Transport,Medium,MEDIUM
+"A pothole on the campus shuttle route is causing vehicles to swerve",Transport,High,HIGH
+"A loose handrail on the main staircase could cause a fall",Maintenance,High,HIGH
+"The library door hinge is squeaking and needs maintenance",Maintenance,Low,LOW
+"A large crack has appeared in the ceiling of the student lounge",Maintenance,Critical,CRITICAL
+"The elevator is stuck between floors with people inside",Maintenance,Critical,CRITICAL
+"Three classroom chairs have loose legs and are unsafe",Maintenance,Medium,MEDIUM
+"The campus drainage grate is broken beside the main walkway",Maintenance,Medium,MEDIUM
+"The library remains locked during its posted open hours",Library,Medium,MEDIUM
+"A required textbook is missing from the course reserve shelf",Library,Low,LOW
+"The exam timetable has a conflicting date for our department",Academic,High,HIGH
+"My attendance record is missing several classes I attended",Academic,Medium,MEDIUM
+"A lecturer has not uploaded the assignment instructions",Academic,Low,LOW
+"The online registration page charged me twice for one fee",Administration,High,HIGH
+"My transcript request has not been processed for two weeks",Administration,Low,LOW
+"The student records office has lost my enrollment confirmation",Administration,Medium,MEDIUM
+"A student is having trouble breathing after exposure to cleaning fumes",Security,Critical,CRITICAL
+"A laboratory chemical container spilled near students",Security,Critical,CRITICAL
+"A campus flood is entering several classrooms after heavy rain",Maintenance,High,HIGH
+"The drinking water dispenser near the classroom is not working",Water Supply,Medium,MEDIUM
+"My hostel shower pressure is low in one bathroom",Water Supply,Low,LOW
+"Students in every building have lost power after a loud electrical bang",Electrical,Critical,CRITICAL
+"There is a loose wire hanging above the hostel entrance",Electrical,High,HIGH
+"An outlet in my room is not supplying power",Electrical,Medium,MEDIUM
+"A pile of trash has been left beside the hostel entrance",Bathroom & Cleaning,Low,LOW
+"The dining hall refrigerator is warm and food may spoil",Mess & Food,High,HIGH
+"The campus WiFi is intermittent for a few students in one classroom",Wi-Fi & Internet,Low,LOW
+"The security camera feed at the back gate has been offline for days",Security,Medium,MEDIUM
+"A broken window in the lab leaves equipment exposed to rain",Classroom & Laboratory,Medium,MEDIUM
+"The accessible ramp is blocked by a parked campus vehicle",Maintenance,High,HIGH
+"My bus pass was approved but the driver says it is invalid",Transport,Low,LOW
+"A hostel bathroom exhaust fan stopped and mold is spreading",Bathroom & Cleaning,Medium,MEDIUM
+"The entire residence block has no hot water this morning",Water Supply,High,HIGH
+"An electrical burning odor is spreading through the classroom wing",Electrical,Critical,CRITICAL
+"The mess food portion was smaller than the posted serving",Mess & Food,Low,LOW
+"Students across campus cannot connect to the exam network",Wi-Fi & Internet,High,HIGH
+"A water faucet is dripping in my room",Water Supply,Low,LOW
+"The sink tap in one washroom leaks slowly",Water Supply,Low,LOW
+"The hostel has no water for all residents today",Water Supply,Critical,CRITICAL
+"Water supply stopped across the residence block overnight",Water Supply,Critical,CRITICAL
+"No drinking water is available in the entire academic building",Water Supply,High,HIGH
+"Water is leaking from the main supply pipe outside the dorm",Water Supply,High,HIGH
+"The shower in my room has very low water pressure",Water Supply,Low,LOW
+"All lights have gone out across the hostel floor",Electrical,High,HIGH
+"No lights are working in the whole residence building",Electrical,High,HIGH
+"The fan in one hostel room spins slowly",Electrical,Medium,MEDIUM
+"A desk lamp bulb is dead in my dorm room",Electrical,Low,LOW
+"Power is unavailable throughout the science building",Electrical,High,HIGH
+"A switch is hot to the touch in one classroom",Electrical,High,HIGH
+"Several rooms in the dorm have no power outlets working",Electrical,High,HIGH
+"The bathroom in my room needs a routine clean",Bathroom & Cleaning,Medium,MEDIUM
+"Our shared washroom is dirty and has not been cleaned this week",Bathroom & Cleaning,Medium,MEDIUM
+"The hostel toilet is dirty and smells bad",Bathroom & Cleaning,Medium,MEDIUM
+"The washroom in my room has a dripping shower",Bathroom & Cleaning,Low,LOW
+"A student left litter on the library floor",Bathroom & Cleaning,Low,LOW
+"The main entrance security guard is absent from the gate",Security,High,HIGH
+"Security staff did not check visitors at the main gate",Security,High,HIGH
+"A person without a campus badge entered the residence hall",Security,High,HIGH
+"The main gate has a security concern after dark",Security,High,HIGH
+"The visitor pass scanner at the entrance is not reading approved passes",Gate Pass,Medium,MEDIUM
+"My campus gate pass will not load from the portal",Gate Pass,Medium,MEDIUM
+"I cannot request a gate pass because the student page shows an error",Gate Pass,Medium,MEDIUM
+"The security guard cannot scan my valid student gate pass",Gate Pass,Medium,MEDIUM
+"A classroom chair is broken and wobbles",Maintenance,Low,LOW
+"A desk in one lecture room has a loose leg",Maintenance,Low,LOW
+"A broken stool in the engineering classroom needs repair",Maintenance,Low,LOW
+"The college library has a broken chair by the reading area",Maintenance,Low,LOW
+"A chair leg snapped and a student fell in the classroom",Maintenance,High,HIGH
+"A lecture room projector is not displaying the presentation",Classroom & Laboratory,Medium,MEDIUM
+"The computer laboratory has no working projector today",Classroom & Laboratory,Medium,MEDIUM
+"The lab sink drain is blocked during a practical class",Classroom & Laboratory,Medium,MEDIUM
+"All computers in the library computer room are offline",Library,High,HIGH
+"The library catalogue is unavailable to all students",Library,Medium,MEDIUM
+"The library book return box is full and overflowing",Library,Low,LOW
+"Several required reference books are missing from the library",Library,Medium,MEDIUM
+"The library study lights are not working in the entire reading room",Library,Medium,MEDIUM
+"The exam schedule lists two of my exams at the same time",Academic,High,HIGH
+"The lecturer cancelled class but the attendance system marked us absent",Academic,Medium,MEDIUM
+"Students have not received the updated course registration schedule",Academic,Medium,MEDIUM
+"The grade posted for my course does not match the returned exam",Academic,Medium,MEDIUM
+"A scholarship application deadline is missing from the student portal",Academic,Low,LOW
+"The student office has not issued my enrollment letter",Administration,Low,LOW
+"The records department entered the wrong date on my transcript",Administration,Medium,MEDIUM
+"Several students were charged the same campus fee twice",Administration,High,HIGH
+"The finance office has not replied about a fee payment receipt",Administration,Low,LOW
+"Campus shuttle service has stopped for all routes this morning",Transport,High,HIGH
+"The college bus is overcrowded and students cannot board safely",Transport,High,HIGH
+"A shuttle seat belt is broken on the campus bus",Transport,High,HIGH
+"The bus route map does not list the new residence stop",Transport,Low,LOW
+"The elevator is slow but working in the administration building",Maintenance,Low,LOW
+"A damaged handrail needs repair at the student center stairs",Maintenance,Medium,MEDIUM
+"Water is entering the classroom from a damaged roof during rain",Maintenance,High,HIGH
+"The residence block maintenance lift has stopped with a student inside",Maintenance,Critical,CRITICAL

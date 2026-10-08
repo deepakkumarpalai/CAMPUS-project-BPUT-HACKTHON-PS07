@@ -49,6 +49,8 @@ import VisitorVerification from '../pages/security/VisitorVerification.jsx';
 import SecurityLayout from '../layouts/SecurityLayout.jsx';
 import SecurityUsers from '../pages/admin/SecurityUsers.jsx';
 import AuditLogs from '../pages/admin/AuditLogs.jsx';
+import CollegeHome from '../pages/CollegeHome.jsx';
+import PublicCampusPage from '../pages/PublicCampusPage.jsx';
 
 const StudentShell = ({ children }) => (
   <ProtectedRoute>
@@ -85,7 +87,7 @@ const SecurityShell = ({ children }) => (
 function HomeRedirect() {
   const { isAuthenticated, user, loading } = useAuth();
   if (loading) return <LoadingSpinner />;
-  if (!isAuthenticated) return <Navigate to="/login" replace />;
+  if (!isAuthenticated) return <CollegeHome />;
   return <Navigate to={dashboardPath(user.role)} replace />;
 }
 
@@ -93,6 +95,18 @@ export default function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<HomeRedirect />} />
+      <Route path="/home" element={<CollegeHome />} />
+      <Route path="/about" element={<PublicCampusPage page="about" />} />
+      <Route path="/departments" element={<PublicCampusPage page="departments" />} />
+      <Route path="/courses" element={<PublicCampusPage page="courses" />} />
+      <Route path="/faculty" element={<PublicCampusPage page="faculty" />} />
+      <Route path="/notices" element={<PublicCampusPage page="notices" />} />
+      <Route path="/events" element={<PublicCampusPage page="events" />} />
+      <Route path="/clubs" element={<PublicCampusPage page="clubs" />} />
+      <Route path="/facilities" element={<PublicCampusPage page="facilities" />} />
+      <Route path="/contact" element={<PublicCampusPage page="contact" />} />
+      <Route path="/admissions" element={<PublicCampusPage page="admissions" />} />
+      <Route path="/placement" element={<PublicCampusPage page="placement" />} />
       <Route path="/login" element={<Login />} />
       <Route path="/register" element={<Register />} />
       <Route path="/visitor/request" element={<VisitorRequest />} />

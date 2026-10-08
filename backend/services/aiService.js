@@ -24,6 +24,7 @@ const CATEGORY_RULES = [
 const SERVICE_CATEGORY_MAP = {
   WATER: 'Water',
   ELECTRICAL: 'Electrical',
+  MAINTENANCE: 'Maintenance',
   CLEANLINESS: 'Cleaning',
   IT: 'IT Support',
   HOSTEL: 'Hostel',
@@ -80,6 +81,7 @@ const detectDepartment = (category, text) => {
   if (category === 'TRANSPORT') return 'TRANSPORT';
   if (category === 'LIBRARY') return 'LIBRARY';
   if (category === 'MESS') return 'MESS';
+  if (category === 'MAINTENANCE') return 'CAMPUS_MAINTENANCE';
   return 'GENERAL_ADMINISTRATION';
 };
 

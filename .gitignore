@@ -6,3 +6,6 @@ uploads/
 .DS_Store
 frontend/node_modules/
 backend/node_modules/
+ai-service/.venv/
+ai-service/__pycache__/
+ai-service/model/*.pkl

@@ -42,7 +42,7 @@ export default function StudentLayout({ children }) {
       <Sidebar items={items} open={open} onClose={() => setOpen(false)} />
       <div className="flex min-h-screen flex-1 flex-col">
         <Navbar onMenu={() => setOpen(true)} />
-        <main className="p-4 lg:p-6">{children}</main>
+        <main className="portal-main">{children}</main>
       </div>
     </div>
   );

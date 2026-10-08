@@ -48,6 +48,7 @@ app.get('/api/health', (_req, res) => {
 });
 
 app.use('/api/auth', require('./routes/authRoutes'));
+app.use('/api/public', require('./routes/publicCampusRoutes'));
 app.use('/api/users', require('./routes/userRoutes'));
 app.use('/api/notices', require('./routes/noticeRoutes'));
 app.use('/api/attendance', require('./routes/attendanceRoutes'));

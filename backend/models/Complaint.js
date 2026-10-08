@@ -17,6 +17,7 @@ const complaintSchema = new mongoose.Schema(
         'IT',
         'TRANSPORT',
         'LIBRARY',
+        'MAINTENANCE',
         'ADMINISTRATION',
         'OTHER'
       ],
@@ -31,6 +32,13 @@ const complaintSchema = new mongoose.Schema(
       type: String,
       enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']
     },
+    priorityScore: { type: Number, min: 0, max: 100 },
+    prioritySource: { type: String, enum: ['AI', 'ADMIN'], default: 'AI' },
+    aiSeverity: { type: String, enum: ['Low', 'Medium', 'High', 'Critical'] },
+    aiUrgency: { type: String, enum: ['Low', 'Medium', 'High', 'Very High'] },
+    affectedPeople: { type: Number, min: 1 },
+    safetyImpact: { type: Number, min: 1, max: 5 },
+    essentialServiceImpact: { type: Number, min: 1, max: 5 },
     finalPriority: {
       type: String,
       enum: ['LOW', 'MEDIUM', 'HIGH', 'CRITICAL']

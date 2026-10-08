@@ -7,12 +7,12 @@ export default function DashboardCard({ title, value, icon, tone = 'blue' }) {
     slate: 'bg-slate-100 text-slate-700'
   };
   return (
-    <div className="card flex items-center justify-between">
+    <div className="card flex min-h-[132px] items-center justify-between transition duration-200 hover:-translate-y-0.5 hover:shadow-md">
       <div>
-        <p className="text-sm text-slate-500">{title}</p>
-        <p className="mt-1 text-2xl font-semibold">{value ?? 0}</p>
+        <p className="text-xs font-medium uppercase tracking-[0.12em] text-slate-500">{title}</p>
+        <p className="mt-2 text-3xl font-semibold tracking-tight text-slate-900">{value ?? 0}</p>
       </div>
-      <div className={`rounded-full p-3 ${tones[tone]}`}>{icon}</div>
+      <div className={`rounded-2xl p-3.5 ${tones[tone]}`}>{icon}</div>
     </div>
   );
 }

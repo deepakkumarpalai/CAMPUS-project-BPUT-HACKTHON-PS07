@@ -10,6 +10,22 @@ import { formatDate, formatDateTime } from '../../utils/format.js';
 import { useToast } from '../../context/ToastContext.jsx';
 import { useAuth } from '../../context/AuthContext.jsx';
 
+const CATEGORY_LABELS = {
+  ACADEMIC: 'Classroom & Laboratory',
+  HOSTEL: 'Hostel',
+  MESS: 'Mess & Food',
+  ELECTRICAL: 'Electrical',
+  WATER: 'Water Supply',
+  CLEANLINESS: 'Bathroom & Cleaning',
+  SECURITY: 'Security',
+  IT: 'Wi-Fi & Internet',
+  TRANSPORT: 'Transport',
+  LIBRARY: 'Library',
+  MAINTENANCE: 'Maintenance',
+  ADMINISTRATION: 'Administration',
+  OTHER: 'Other'
+};
+
 export default function ComplaintsPage({ mode = 'student' }) {
   const { user } = useAuth();
   const { push } = useToast();
@@ -23,6 +39,8 @@ export default function ComplaintsPage({ mode = 'student' }) {
   const [open, setOpen] = useState(false);
   const [selected, setSelected] = useState(null);
   const [search, setSearch] = useState('');
+  const [priorityOverrideChanged, setPriorityOverrideChanged] = useState(false);
+  const [priorityOverrideOpen, setPriorityOverrideOpen] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', location: '', category: 'OTHER' });
   const [review, setReview] = useState({ status: 'PENDING', finalPriority: 'MEDIUM', assignedTo: '', adminRemarks: '' });
 
@@ -41,9 +59,14 @@ export default function ComplaintsPage({ mode = 'student' }) {
   const saveReview = async (e) => {
     e.preventDefault();
     try {
-      await complaintService.update(selected._id, review);
-      push('Complaint updated. AI recommendation was not applied automatically.', 'success');
+      const { finalPriority, ...workflowReview } = review;
+      const payload = mode === 'admin' && priorityOverrideChanged
+        ? { ...workflowReview, finalPriority, priority: finalPriority }
+        : workflowReview;
+      await complaintService.update(selected._id, payload);
+      push(priorityOverrideChanged ? 'Complaint updated with an administrator priority override.' : 'Complaint review saved.', 'success');
       setSelected(null);
+      setPriorityOverrideOpen(false);
       reload();
     } catch (err) {
       push(err.userMessage || 'Update failed', 'error');
@@ -66,7 +89,10 @@ export default function ComplaintsPage({ mode = 'student' }) {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-semibold">Complaints</h2>
+        <div>
+          <p className="text-xs font-semibold uppercase tracking-[0.2em] text-amber-700">{mode === 'admin' ? 'AI-assisted recommendations' : 'Campus support'}</p>
+          <h2 className="mt-1 text-2xl font-semibold tracking-tight text-slate-900">{mode === 'admin' ? 'Complaint priority' : 'Complaints'}</h2>
+        </div>
         {mode !== 'admin' && (
           <button className="btn-primary" type="button" onClick={() => setOpen(true)}>
             New complaint
@@ -79,9 +105,11 @@ export default function ComplaintsPage({ mode = 'student' }) {
         rows={rows}
         columns={[
           { key: 'title', label: 'Title' },
-          { key: 'category', label: 'Category', render: (row) => row.category },
+          { key: 'category', label: 'Category', render: (row) => CATEGORY_LABELS[row.category] || row.category },
           { key: 'priority', label: 'Priority', render: (row) => <StatusBadge value={row.finalPriority || row.priority} /> },
-          { key: 'ai', label: 'AI recommended', render: (row) => <StatusBadge value={row.aiRecommendedPriority} /> },
+          { key: 'ai', label: 'AI recommendation', render: (row) => <div className="space-y-1"><StatusBadge value={row.aiRecommendedPriority} /><p className="text-[10px] text-slate-500">{row.prioritySource === 'ADMIN' ? 'Admin override' : row.aiAnalysis?.analysisMode === 'ML_NLP' ? 'AI suggested' : 'Existing fallback'}</p></div> },
+          { key: 'score', label: 'Score', render: (row) => Number.isFinite(row.priorityScore) ? <span className="font-semibold tabular-nums">{row.priorityScore}/100</span> : '—' },
+          { key: 'reason', label: 'AI reason', render: (row) => <span className="block max-w-xs text-xs leading-5 text-slate-600">{row.priorityReason || 'Not available'}</span> },
           { key: 'status', label: 'Status', render: (row) => <StatusBadge value={row.status} /> },
           { key: 'department', label: 'Department' },
           { key: 'location', label: 'Location' },
@@ -90,7 +118,7 @@ export default function ComplaintsPage({ mode = 'student' }) {
           { key: 'date', label: 'Submitted', render: (row) => formatDate(row.createdAt) },
           { key: 'assigned', label: 'Assigned', render: (row) => row.assignedTo?.name || '—' },
           ...(canManage
-            ? [{ key: 'act', label: 'Action', render: (row) => <button className="btn-secondary" type="button" onClick={() => { setSelected(row); setReview({ status: row.status, finalPriority: row.finalPriority || row.priority, assignedTo: row.assignedTo?._id || '', adminRemarks: row.adminRemarks || '' }); }}>Review</button> }]
+            ? [{ key: 'act', label: 'Action', render: (row) => <button className="btn-secondary" type="button" onClick={() => { setSelected(row); setPriorityOverrideChanged(false); setPriorityOverrideOpen(false); setReview({ status: row.status, finalPriority: row.finalPriority || row.priority, assignedTo: row.assignedTo?._id || '', adminRemarks: row.adminRemarks || '' }); }}>Review</button> }]
             : [])
         ]}
       />
@@ -119,11 +147,15 @@ export default function ComplaintsPage({ mode = 'student' }) {
           <form onSubmit={saveReview} className="space-y-3">
             <p className="text-sm text-slate-600">{selected.description}</p>
             <div className="rounded-lg bg-slate-50 p-3 text-sm">
-              <p className="font-medium">
-                {selected.aiAnalysis?.analysisMode === 'AI' ? 'AI Analysis' : 'Rule-Based Analysis'}
+              <p className="font-semibold text-slate-900">AI-Assisted Complaint Priority Recommendation</p>
+              <p className="mt-1 text-xs font-medium uppercase tracking-wide text-slate-500">
+                {selected.aiAnalysis?.analysisMode === 'ML_NLP' ? 'TF-IDF + Logistic Regression' : selected.aiAnalysis?.analysisMode === 'AI' ? 'External AI analysis' : 'Existing rule-based analysis'}
               </p>
               <p>Summary: {selected.aiAnalysis?.summary || '—'}</p>
               <p>Reason: {selected.priorityReason || selected.aiAnalysis?.reason}</p>
+              <p>Severity: {selected.aiSeverity || selected.aiAnalysis?.severity || 'Not scored'} · Urgency: {selected.aiUrgency || selected.aiAnalysis?.urgency || 'Not scored'}</p>
+              <p>Potentially affected: {selected.affectedPeople || selected.aiAnalysis?.affectedPeople || 'Not estimated'} · Priority score: {Number.isFinite(selected.priorityScore) ? `${selected.priorityScore}/100` : 'Not scored'}</p>
+              <p>AI priority: {selected.aiRecommendedPriority || 'Not available'} · Current priority: {selected.finalPriority || selected.priority} ({selected.prioritySource || 'AI'})</p>
               <p>Keywords: {(selected.aiAnalysis?.keywords || []).join(', ') || '—'}</p>
               <p>SLA due: {formatDateTime(selected.dueAt)} · Escalations: {selected.escalationCount || 0}</p>
               {selected.isRecurring && <p className="mt-2 font-medium text-amber-700">Recurring issue: {selected.recurrenceCount} reports at this location in 14 days.</p>}
@@ -150,15 +182,36 @@ export default function ComplaintsPage({ mode = 'student' }) {
                   <option>REJECTED</option>
                 </select>
               </div>
-              <div>
-                <label>Final priority (editable)</label>
-                <select value={review.finalPriority} onChange={(e) => setReview({ ...review, finalPriority: e.target.value, priority: e.target.value })}>
-                  <option>CRITICAL</option>
-                  <option>HIGH</option>
-                  <option>MEDIUM</option>
-                  <option>LOW</option>
-                </select>
-              </div>
+              {mode === 'admin' && <div className="sm:col-span-2">
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-slate-200 bg-white p-4">
+                  <div>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">AI priority</p>
+                    <div className="mt-2"><StatusBadge value={selected.aiRecommendedPriority || selected.priority} /></div>
+                    <p className="mt-2 text-xs text-slate-500">Current source: {selected.prioritySource || 'AI'}</p>
+                  </div>
+                  <button className="btn-secondary" type="button" onClick={() => {
+                    if (priorityOverrideOpen) {
+                      setPriorityOverrideChanged(false);
+                      setReview({ ...review, finalPriority: selected.finalPriority || selected.priority });
+                    }
+                    setPriorityOverrideOpen(!priorityOverrideOpen);
+                  }}>
+                    {priorityOverrideOpen ? 'Cancel priority change' : 'Change Priority'}
+                  </button>
+                </div>
+                {priorityOverrideOpen && <div className="mt-3">
+                  <label htmlFor="admin-priority-override">Admin override</label>
+                  <select id="admin-priority-override" value={review.finalPriority} onChange={(e) => { setPriorityOverrideChanged(true); setReview({ ...review, finalPriority: e.target.value }); }}>
+                    <option>CRITICAL</option>
+                    <option>HIGH</option>
+                    <option>MEDIUM</option>
+                    <option>LOW</option>
+                  </select>
+                  <p className="mt-1 text-xs text-slate-500">
+                    The AI suggestion remains unchanged. Saving your selection stores the current priority source as ADMIN.
+                  </p>
+                </div>}
+              </div>}
             </div>
             <div>
               <label>Assign to</label>
@@ -173,7 +226,7 @@ export default function ComplaintsPage({ mode = 'student' }) {
               <label>Admin remarks</label>
               <textarea rows={3} value={review.adminRemarks} onChange={(e) => setReview({ ...review, adminRemarks: e.target.value })} />
             </div>
-            <p className="text-xs text-slate-500">AI never auto-rejects or auto-resolves complaints. {user.name} remains the decision maker.</p>
+            <p className="text-xs leading-5 text-slate-500">AI priority is a recommendation and may be wrong. {user.name} makes the final decision; the system never automatically rejects or resolves a complaint.</p>
             <button className="btn-primary">Save review</button>
           </form>
         )}

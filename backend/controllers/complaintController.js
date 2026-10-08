@@ -1,28 +1,37 @@
 const Complaint = require('../models/Complaint');
+const AIAnalysis = require('../models/AIAnalysis');
 const { asyncHandler } = require('../middleware/errorMiddleware');
 const { validateComplaint } = require('../validators/complaintValidator');
-const { analyzeRequest } = require('../services/aiService');
+const { analyzeRequest, detectDepartment } = require('../services/aiService');
+const { analyzeComplaintPriority } = require('../services/complaintPriorityService');
 const { createNotification, notifyAdmins } = require('../services/notificationService');
 const { getSlaDeadline } = require('../services/complaintSla');
 const { recordAudit } = require('../services/auditService');
-
-const PRIORITY_ORDER = { CRITICAL: 0, HIGH: 1, MEDIUM: 2, LOW: 3 };
+const { sortComplaintsByPriority } = require('../services/complaintPrioritySort');
 
 const getComplaints = asyncHandler(async (req, res) => {
   const filter = {};
+  const andFilters = [];
   if (req.user.role === 'STUDENT') filter.submittedBy = req.user._id;
   if (req.user.role === 'FACULTY' && req.query.mine === 'true') filter.submittedBy = req.user._id;
   if (req.query.status) filter.status = req.query.status;
-  if (req.query.priority) filter.priority = req.query.priority;
+  if (req.query.priority) {
+    andFilters.push({
+      $or: [{ finalPriority: req.query.priority }, { priority: req.query.priority }]
+    });
+  }
   if (req.query.category) filter.category = req.query.category;
   if (req.query.department) filter.department = req.query.department;
   if (req.query.search) {
-    filter.$or = [
-      { title: { $regex: req.query.search, $options: 'i' } },
-      { description: { $regex: req.query.search, $options: 'i' } },
-      { location: { $regex: req.query.search, $options: 'i' } }
-    ];
+    andFilters.push({
+      $or: [
+        { title: { $regex: req.query.search, $options: 'i' } },
+        { description: { $regex: req.query.search, $options: 'i' } },
+        { location: { $regex: req.query.search, $options: 'i' } }
+      ]
+    });
   }
+  if (andFilters.length) filter.$and = andFilters;
 
   const complaints = await Complaint.find(filter)
     .populate('submittedBy', 'name role department studentId facultyId')
@@ -32,11 +41,7 @@ const getComplaints = asyncHandler(async (req, res) => {
     .populate('linkedComplaints', 'title status priority')
     .sort({ createdAt: -1 });
 
-  const sorted = complaints.sort((a, b) => {
-    const pa = PRIORITY_ORDER[a.finalPriority || a.priority] ?? 9;
-    const pb = PRIORITY_ORDER[b.finalPriority || b.priority] ?? 9;
-    return pa - pb;
-  });
+  const sorted = sortComplaintsByPriority(complaints);
 
   res.json({ success: true, count: sorted.length, data: sorted });
 });
@@ -70,21 +75,62 @@ const createComplaint = asyncHandler(async (req, res) => {
     department: req.body.department || req.user.department || ''
   });
 
-  const analysis = await analyzeRequest({
-    sourceType: 'COMPLAINT',
-    sourceId: complaint._id,
-    title: complaint.title,
-    description: complaint.description,
-    location: complaint.location
-  });
+  let analysis;
+  try {
+    analysis = await analyzeComplaintPriority(
+      `${complaint.title}\n${complaint.description}\n${complaint.location || ''}`
+    );
+  } catch (error) {
+    console.error('AI priority service unavailable; using existing complaint analysis.', error);
+    analysis = await analyzeRequest({
+      sourceType: 'COMPLAINT',
+      sourceId: complaint._id,
+      title: complaint.title,
+      description: complaint.description,
+      location: complaint.location
+    });
+  }
 
-  complaint.category = req.body.category || analysis.category || complaint.category;
+  if (analysis.analysisMode === 'ML_NLP') {
+    const analysisRecord = await AIAnalysis.create({
+      sourceType: 'COMPLAINT',
+      sourceId: complaint._id,
+      analysisMode: 'ML_NLP',
+      category: analysis.categoryCode,
+      priority: analysis.priority,
+      severity: analysis.severity,
+      urgency: analysis.urgency,
+      affectedPeople: analysis.affectedPeople,
+      safetyImpact: analysis.safetyImpact,
+      essentialServiceImpact: analysis.essentialServiceImpact,
+      priorityScore: analysis.priorityScore,
+      reason: analysis.reason,
+      summary: complaint.description.slice(0, 160),
+      keywords: []
+    });
+    analysis = { ...analysis, _id: analysisRecord._id, department: '' };
+  }
+
+  const submittedCategory = req.body.category && req.body.category !== 'OTHER'
+    ? req.body.category
+    : null;
+  complaint.category = submittedCategory || analysis.categoryCode || analysis.category || complaint.category;
   complaint.aiRecommendedPriority = analysis.priority;
   complaint.priority = analysis.priority;
   complaint.finalPriority = analysis.priority;
+  complaint.prioritySource = 'AI';
+  complaint.priorityScore = analysis.priorityScore;
+  complaint.aiSeverity = analysis.severity;
+  complaint.aiUrgency = analysis.urgency;
+  complaint.affectedPeople = analysis.affectedPeople;
+  complaint.safetyImpact = analysis.safetyImpact;
+  complaint.essentialServiceImpact = analysis.essentialServiceImpact;
   complaint.dueAt = getSlaDeadline(analysis.priority, complaint.createdAt);
   complaint.priorityReason = analysis.reason;
-  complaint.department = complaint.department || analysis.department;
+  complaint.department = complaint.department || analysis.department || detectDepartment(
+    analysis.categoryCode || analysis.category,
+    `${complaint.title} ${complaint.description} ${complaint.location || ''}`
+  );
   complaint.aiAnalysis = analysis._id;
 
   if (complaint.location.trim()) {
@@ -102,7 +148,7 @@ const createComplaint = asyncHandler(async (req, res) => {
 
   await notifyAdmins({
     title: 'New complaint submitted',
-    message: `${complaint.title} (${analysis.analysisMode === 'AI' ? 'AI Analysis' : 'Rule-Based Analysis'})`,
+    message: `${complaint.title} (${analysis.analysisMode === 'ML_NLP' ? 'AI-assisted NLP recommendation' : analysis.analysisMode === 'AI' ? 'AI Analysis' : 'Rule-Based Analysis'})`,
     type: 'COMPLAINT'
   });
   if (complaint.isRecurring) {
@@ -125,6 +171,11 @@ const updateComplaint = asyncHandler(async (req, res) => {
     return res.status(403).json({ success: false, message: 'Students cannot update complaint workflow fields.' });
   }
 
+  const priorityWasSubmitted = req.body.finalPriority !== undefined || req.body.priority !== undefined;
+  if (priorityWasSubmitted && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ success: false, message: 'Only administrators can override AI priority.' });
+  }
+
   const previousStatus = complaint.status;
   const updatable = [
     'category',
@@ -145,6 +196,7 @@ const updateComplaint = asyncHandler(async (req, res) => {
   if (req.body.finalPriority || req.body.priority) {
     complaint.finalPriority = req.body.finalPriority || req.body.priority;
     complaint.priority = req.body.priority || req.body.finalPriority;
+    complaint.prioritySource = 'ADMIN';
     complaint.priorityReviewedBy = req.user._id;
     complaint.priorityReviewedAt = new Date();
     complaint.dueAt = getSlaDeadline(complaint.finalPriority, complaint.createdAt);
